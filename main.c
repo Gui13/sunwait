@@ -5,6 +5,8 @@
 #include <stdlib.h> 
 #include <math.h>
 #include <time.h>
+#include <string.h>
+#include <unistd.h>
 
 #include "sunriset.h"
 
@@ -26,6 +28,10 @@
 #define LAT_SET 0x1
 #define LON_SET 0x2
 
+
+int print_everything(int year, int month, int day,
+					 double lat, double lon,
+					 struct tm* tm, char local);
 
 typedef struct _map {
   char * label;
@@ -50,7 +56,7 @@ map options[] = {
   { NULL, 0, 0 }
 };
 
-print_usage() 
+void print_usage()
 {
   FILE* f = stdout;
   fprintf(f, "usage: sunwait [options] [sun|civ|naut|astr] [up|down] [+/-offset] [latitude] [longitude]\n\n");
@@ -85,7 +91,7 @@ int main(int argc, char *argv[])
   int coords_set = 0;
   double temp;
   int local = 1;
-  int hemisphere;
+  char hemisphere[2] = {0};
   int mode = MODE_USAGE;
   int offset_hour = 0; 
   int offset_min = 0;
@@ -137,25 +143,25 @@ int main(int argc, char *argv[])
       day = 1 + atoi(argv[i]);
     }
 
-    if (2 == sscanf(argv[i], "%lf%1[Nn]", &temp, &hemisphere)) {
+    if (2 == sscanf(argv[i], "%lf%1[Nn]", &temp, hemisphere)) {
       lat = temp; 
       coords_set |= LAT_SET;
     }
-    if (2 == sscanf(argv[i], "%lf%1[Ss]", &temp, &hemisphere)) {
+    if (2 == sscanf(argv[i], "%lf%1[Ss]", &temp, hemisphere)) {
       lat = -temp;
       coords_set |= LAT_SET;
     }
-    if (2 == sscanf(argv[i], "%lf%1[Ww]", &temp, &hemisphere)) {
+    if (2 == sscanf(argv[i], "%lf%1[Ww]", &temp, hemisphere)) {
       lon = -temp;
       coords_set |= LON_SET;
     }
     /* this looks different from the others because 77E 
        parses as scientific notation */
-    if (1 == sscanf(argv[i], "%lf%", &temp, &hemisphere)
-	&& (argv[i][strlen(argv[i])-1] == 'E' ||
+	  if (1 == sscanf(argv[i], "%lf%[Ee]", &temp, hemisphere)
+		  && (argv[i][strlen(argv[i])-1] == 'E' ||
 	    argv[i][strlen(argv[i])-1] == 'e')) {
-      lon = temp;
-      coords_set |= LON_SET;
+			  lon = temp;
+			  coords_set |= LON_SET;
     }
 
     for (j=0; options[j].label; j++) {

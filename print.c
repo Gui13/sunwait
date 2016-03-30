@@ -67,7 +67,7 @@ int print_everything(int year, int month, int day,
   if (local)
     printf( "Local time:                 %2d:%2.2d \n", tm->tm_hour, tm->tm_min);
   else
-    printf( "Zulu time (UTC):            %2d:%2.2d %s\n", 
+    printf( "Zulu time (UTC):            %2ld:%2.2d %s\n", 
 	    TMOD(tm->tm_hour - (timezone_offset/3600)), 
 	    tm->tm_min, 
 	    DAYSOFF(tm->tm_hour - (timezone_offset/3600)));
@@ -92,10 +92,10 @@ int print_everything(int year, int month, int day,
   astr = astronomical_twilight( year, month, day, lon, lat,
 				&astr_start, &astr_end );
   
-  printf( "Current specified time zone: %s (%d from UTC) \n", timezone_name, +timezone_offset/3600 );
+  printf( "Current specified time zone: %s (%ld from UTC) \n", timezone_name, +timezone_offset/3600 );
 
   if (local)
-    printf( "Sun transits meridian %2.2d%2.2d %s\n", 
+    printf( "Sun transits meridian %2.2ld%2.2d %s\n", 
 	    TMOD(HOURS((rise+set)/2.0) + timezone_offset/3600),
 	    MINUTES((rise+set)/2.0),
 	    timezone_name);
@@ -123,5 +123,5 @@ int print_everything(int year, int month, int day,
 		    "ends", astr_end,
 		    "Never darker than astronomical twilight",
 		    "Never as bright as astronomical twilight");
-  
+	return 0;
 }
